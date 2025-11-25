@@ -1,0 +1,30 @@
+package:
+  name: registry-docgen-scripts
+  dependencies:
+    - aff
+    - arrays
+    - bifunctors
+    - codec-json
+    - console
+    - effect
+    - either
+    - filterable
+    - foldable-traversable
+    - json
+    - language-cst-parser
+    - maybe
+    - newtype
+    - node-buffer
+    - node-fs
+    - node-glob-basic
+    - node-path
+    - node-process
+    - ordered-collections
+    - parallel
+    - prelude
+    - registry-docgen
+    - registry-lib
+    - safe-coerce
+    - strings
+    - transformers
+    - tuples

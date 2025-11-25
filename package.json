@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "purescript": "^0.15.15",
+    "purs-tidy": "^0.11.0",
+    "spago": "^0.93.44"
+  },
+  "dependencies": {
+    "commonmark": "^0.31.2"
+  },
+  "scripts": {
+    "format": "purs-tidy format-in-place src scripts/src",
+    "build": "spago build --ensure-ranges --pedantic-packages",
+    "migrate-legacy-docs": "spago run -p registry-docgen-scripts -m MigrateLegacyDocs"
+  }
+}
