@@ -33,7 +33,7 @@ import Node.Glob.Basic (expandGlobs)
 import Node.Path (FilePath)
 import Node.Path as Path
 import Node.Process as Process
-import PureScript.CST (RecoveredParserResult(..), parseModule)
+import PureScript.CST (PartialModule(..), RecoveredParserResult(..), parsePartialModule)
 import PureScript.CST.Errors (printParseError)
 import PureScript.CST.Parser.Monad (PositionedError)
 import PureScript.CST.Types as CST
@@ -61,7 +61,7 @@ buildDocModules options = runExceptT do
   let
     srcDir = Path.concat [ options.packageDirectory, "src" ]
     srcModuleNames = Set.fromFoldable $ Array.mapMaybe
-      ( \{ sourceModule: CST.Module { header: CST.ModuleHeader { name: CST.Name { name } } }, sourcePath } ->
+      ( \{ sourceModule: CST.ModuleHeader { name: CST.Name { name } }, sourcePath } ->
           const (coerce name) <$> String.stripPrefix (Pattern srcDir) sourcePath
       )
       srcModules
@@ -97,8 +97,8 @@ buildDocModules options = runExceptT do
   getAllSourceModules = do
     allSourceModules <- lift $ flip parTraverse options.sources \sourcePath -> do
       contents <- FS.readTextFile UTF8 sourcePath
-      pure $ case parseModule contents of
-        ParseSucceeded sourceModule ->
+      pure $ case parsePartialModule contents of
+        ParseSucceeded (PartialModule { header: sourceModule }) ->
           Right { sourcePath, sourceModule }
         ParseSucceededWithErrors _ errs ->
           Left $ Tuple sourcePath $ intercalateMap "\n" printPositionedError errs

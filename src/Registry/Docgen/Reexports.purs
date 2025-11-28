@@ -63,11 +63,11 @@ type ImportModuleSet = SemigroupMap ModuleName (RefSet ModuleMemberSet)
 
 data ReexportResult = Pending | Missing | Blocked | Result DocModule
 
-modulesWithReexports :: Array DocModule -> Array (CST.Module Void) -> Either (NonEmptyArray ModuleName) (Array DocModule)
+modulesWithReexports :: Array DocModule -> Array (CST.ModuleHeader Void) -> Either (NonEmptyArray ModuleName) (Array DocModule)
 modulesWithReexports allDocs allSourceModules = go Map.empty $ keysOf modules
   where
   sourceModulesByName = Map.fromFoldable $ map
-    ( \(sourceModule@(CST.Module { header: CST.ModuleHeader { name: CST.Name { name } } })) ->
+    ( \(sourceModule@(CST.ModuleHeader { name: CST.Name { name } })) ->
         Tuple (coerce name) sourceModule
     )
     allSourceModules
@@ -230,8 +230,8 @@ declInMemberSet (ModuleMemberSet members) decl@(DocDeclaration { children, info,
   unqualify :: forall a. Qualified a -> a
   unqualify (Qualified { name }) = name
 
-reexportsOf :: CST.Module Void -> Map ModuleName (RefSet ModuleMemberSet)
-reexportsOf sourceModule@(CST.Module { header: CST.ModuleHeader { exports } }) =
+reexportsOf :: CST.ModuleHeader Void -> Map ModuleName (RefSet ModuleMemberSet)
+reexportsOf sourceModule@(CST.ModuleHeader { exports }) =
   un SemigroupMap $ fold $ Map.filterWithKey (\k _ -> Set.member k moduleKeys) importSet
   where
   SemigroupMap importSet = importSetOf sourceModule
@@ -242,8 +242,8 @@ reexportsOf sourceModule@(CST.Module { header: CST.ModuleHeader { exports } }) =
     _ ->
       mempty
 
-importSetOf :: CST.Module Void -> SemigroupMap ModuleName ImportModuleSet
-importSetOf (CST.Module { header: CST.ModuleHeader { imports } }) =
+importSetOf :: CST.ModuleHeader Void -> SemigroupMap ModuleName ImportModuleSet
+importSetOf (CST.ModuleHeader { imports }) =
   foldMap fromImportDecl imports
   where
   ModuleMemberSet initial = mempty
